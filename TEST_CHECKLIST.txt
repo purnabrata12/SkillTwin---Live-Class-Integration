@@ -1,0 +1,39 @@
+SkillTwin v8 test checklist
+===========================
+
+1. Copy server/.env from your working project.
+2. npm install
+3. npm run install:all
+4. npm run check:livekit   -> must say RESULT: VALID
+5. npm run dev
+
+Trainer test:
+- Create a fresh class.
+- Start class.
+- Camera ON -> OFF -> ON.
+- Microphone ON -> OFF -> ON.
+- Details -> Copy trainee invite.
+
+Trainee test in Edge/Incognito:
+- Paste the exact trainee invite.
+- Join with a different name.
+- Confirm both cameras appear.
+- Send chat from trainee; it must appear for both.
+- Send chat from trainer; it must appear for both.
+
+Trainer moderation:
+- Mute microphone -> trainee mic turns off.
+- Disable microphone -> trainee mic turns off and control is blocked.
+- Allow microphone -> trainee can turn it on again.
+- Disable camera -> trainee camera turns off and control is blocked.
+- Allow camera -> trainee can turn it on again.
+- Block screen sharing -> trainee cannot present.
+- Spotlight -> both clients update.
+- Remove -> trainee leaves.
+
+Whiteboard:
+- Open Whiteboard.
+- Draw several strokes.
+- Clear.
+- Close.
+- It must not crash the live-class screen.

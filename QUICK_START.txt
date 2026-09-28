@@ -1,0 +1,71 @@
+SKILLTWIN LIVE CLASSROOM v6 - QUICK START
+=========================================
+
+1. EXTRACT THIS ZIP INTO A NEW FOLDER.
+
+2. COPY YOUR WORKING LIVEKIT ENV FILE:
+   old-project/server/.env
+   -> v6-project/server/.env
+
+   It should contain:
+
+   PORT=3001
+   CLIENT_ORIGIN=http://localhost:5173,http://127.0.0.1:5173,https://skilltwin-five.vercel.app
+   LIVEKIT_URL=wss://YOUR_PROJECT.livekit.cloud
+   LIVEKIT_API_KEY=YOUR_KEY
+   LIVEKIT_API_SECRET=YOUR_SECRET
+
+3. CREATE client/.env FROM client/.env.example:
+
+   VITE_API_URL=http://localhost:3001
+   VITE_PUBLIC_APP_URL=
+
+4. OPEN THE MAIN PROJECT FOLDER IN VS CODE AND RUN:
+
+   npm install
+   npm run install:all
+   npm run dev
+
+5. TRAINER:
+
+   http://localhost:5173/?role=trainer&name=Trainer
+
+   Create a NEW session -> preview -> Start class.
+
+6. SHARE WITH TRAINEE:
+
+   In the live room:
+   Details -> Copy trainee invite
+
+   SHARE THAT EXACT LINK. Do not type or change the meeting ID manually.
+
+7. TRAINEE:
+
+   Open the copied link in Edge, Chrome Incognito, or another browser.
+   Enter trainee name -> Join now.
+
+   Alternative:
+   http://localhost:5173/
+   Paste the Meeting ID OR complete invite link.
+
+8. TEST MEDIA:
+
+   Camera ON -> OFF -> ON -> OFF -> ON
+   Mic ON -> OFF -> ON -> OFF -> ON
+   Present -> Stop Presenting -> Present again
+
+9. IF YOU SEE "CONNECTING" FOR MORE THAN ABOUT 10 SECONDS:
+
+   - Check server terminal says: LiveKit configured: YES
+   - Check server/.env
+   - Check LIVEKIT_URL is your correct project URL
+   - Check API key/secret are from the same LiveKit project
+   - Check internet access
+
+IMPORTANT
+=========
+
+- Never share LIVEKIT_API_SECRET.
+- localhost works only on the same PC.
+- For another phone/PC, use LAN/public URLs and make backend port 3001 reachable.
+- For Vercel/public deployment, VITE_API_URL must be a PUBLIC backend URL.
