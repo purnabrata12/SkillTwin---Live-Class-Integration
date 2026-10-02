@@ -1,249 +1,749 @@
-# SkillTwin Live Classroom v6
+# SkillTwin Live Classroom
 
-A React + Vite live-class module for the SkillTwin LMS with separate Trainer and Trainee behavior connected to the same LiveKit room.
+> Real-time Trainer–Trainee live classroom module for the SkillTwin learning platform.
 
-This version focuses on two things:
+SkillTwin Live Classroom is a dedicated live-learning module for the existing SkillTwin LMS. It combines **React + Vite**, **Node.js + Express**, **Socket.IO**, **LiveKit Cloud**, and **WebRTC** to deliver real-time classes with audio, video, screen sharing, moderation, chat, waiting room, and a synchronized whiteboard.
 
-1. A clean SkillTwin blue/white visual theme that fits the main portal.
-2. Reliable Trainer/Trainee joining and repeated camera/microphone switching.
+> **Scope:** This repository contains the **Live Classroom module only**. It does not include the complete LMS login/registration, payments, marketplace, admin dashboard, or course-management system.
 
-## Stack
+---
 
-- React 18 + Vite
-- LiveKit React Components + livekit-client
-- Node.js + Express token/API server
-- Socket.IO for classroom state, waiting room, chat, hand raise, spotlight and moderation signals
-- No Docker required
+## Tech Stack
 
-## v6 fixes
+| Area | Technology |
+|---|---|
+| Frontend | React.js, Vite, JavaScript, HTML5, CSS3 |
+| Backend | Node.js, Express.js |
+| Classroom realtime events | Socket.IO |
+| Audio / Video / Screen sharing | LiveKit Cloud, WebRTC |
+| UI icons | Lucide React |
+| Package management | npm |
 
-### Trainer / Trainee joining
+---
 
-- Trainer creates one room and gets an exact trainee invite link.
-- Trainee invite always contains `role=trainee`.
-- The Join page accepts either a Meeting ID or the full invite URL.
-- The Join page validates the room before redirecting, so a wrong code gives a clear error instead of opening a dead class page.
-- Trainee identities are unique, so multiple learners can join the same room without replacing each other.
-- Trainer identity remains the Host identity and is shown as `Trainer / Host`.
-- Sessions are persisted to `server/data/sessions.json` during development, so a normal backend restart does not instantly erase rooms.
-- Meeting IDs are normalized to uppercase.
+## Screenshots
 
-### Camera / microphone reliability
+### Trainer — Create Live Class
 
-- Live meeting media state now comes from LiveKit's reactive `useLocalParticipant()` state instead of a custom polling state.
-- Camera supports repeated `ON -> OFF -> ON` switching.
-- Microphone supports repeated `ON -> OFF -> ON` switching.
-- Pre-join camera and microphone are acquired as separate tracks, so turning one off does not destroy the other.
-- A short release delay is used between pre-join preview and LiveKit connection to avoid Windows/browser camera-busy races.
-- Device switching is preserved for later camera/mic re-enable.
-- Trainer mute/disable actions do not permanently SFU-mute a track and block later user re-enable.
+![Trainer Create Live Class](docs/screenshots/trainer-create-live-class.png)
 
-### Connection reliability
+### Trainer — Ready to Join
 
-- LiveKit URL is normalized automatically. `skilltwin-xxxx.livekit.cloud` is accepted and converted to `wss://...`.
-- Visible LiveKit connection errors replace silent endless `Connecting` states.
-- A slow-connection warning appears after 10 seconds.
-- Frontend development server binds to `0.0.0.0`, allowing LAN testing.
-- Invite URL can be controlled with `VITE_PUBLIC_APP_URL`.
+![Trainer Ready to Join](docs/screenshots/trainer-ready-to-join.png)
 
-### UI / theme
+### Trainer — Live Classroom
 
-- SkillTwin blue/indigo branding
-- Light dashboard chrome and side panels
-- Dark focused video stage
-- Rounded cards, soft borders and portal-style backgrounds
-- Matching Trainer create page, Trainee join page, pre-join page, meeting header, participant panel, chat, settings and dialogs
-- Responsive desktop/mobile layout
+![Trainer Live Classroom](docs/screenshots/trainer-live-classroom.png)
 
-## 1. Server environment
+### Trainee — Join Live Class
 
-Copy:
+![Trainee Join Live Class](docs/screenshots/trainee-join-live-class.png)
 
+### Trainee — Ready to Join
+
+![Trainee Ready to Join](docs/screenshots/trainee-ready-to-join.png)
+
+### Trainee — Live Classroom
+
+![Trainee Live Classroom](docs/screenshots/trainee-live-classroom.png)
+
+---
+
+# Complete Feature Set
+
+## 1. Trainer and Trainee Roles
+- Separate Trainer and Trainee experiences.
+- Trainer acts as classroom host.
+- Trainee joins as participant.
+- Trainer is shown as **Trainer / Host**.
+- Trainees are shown as **Trainee**.
+- Each participant gets a unique identity.
+
+## 2. Live Session Creation
+Trainer can configure:
+- Course name
+- Session title
+- Start time
+- Optional end time
+- Optional custom meeting ID
+- Waiting room
+- Mute trainees on entry
+- Allow trainee microphone
+- Allow trainee camera
+- Allow trainee screen sharing
+
+If no custom ID is supplied, SkillTwin generates a meeting ID such as `SKT-CYBERS-XXXXXX`.
+
+## 3. Meeting ID and Invite Link
+- Unique meeting ID for every class.
+- Copy meeting ID.
+- Copy Trainee invite link.
+- Trainee can join with meeting ID or full invite URL.
+- Invite link automatically uses Trainee role.
+- Join flow verifies the meeting before continuing.
+
+## 4. Trainee Join Page
+Trainee enters:
+- Name
+- Meeting ID or invite link
+
+Then selects **Continue to Preview**.
+
+## 5. Pre-Join Screen
+- Camera preview
+- Microphone control
+- Camera control
+- Device settings
+- Meeting information
+- Trainer information
+- **Start Class** button for Trainer
+- **Join Now** button for Trainee
+
+## 6. Camera Controls
+- Camera ON / OFF.
+- Camera can be re-enabled after disabling it.
+- Repeated ON → OFF → ON cycles supported.
+- LiveKit camera-state synchronization.
+- Camera permission handling.
+- Trainer can disable a Trainee camera.
+- Trainer can restore camera permission.
+
+## 7. Microphone Controls
+- Microphone ON / OFF.
+- Re-enable microphone.
+- Trainer can mute participant.
+- Trainer can disable Trainee microphone.
+- Trainer can allow microphone again.
+- Trainer can use **Mute All**.
+
+## 8. Live Video Classroom
+- Real-time Trainer ↔ Trainee video.
+- Real-time audio.
+- Multiple participants in one room.
+- Responsive participant tiles.
+- Local participant identification.
+- Trainer / Host identification.
+- Participant count.
+- Generic avatar when camera is off.
+
+## 9. LiveKit Integration
+LiveKit handles:
+- Audio
+- Video
+- WebRTC communication
+- Screen sharing
+- Participant tracks
+- Camera/microphone publishing
+- Room connection management
+
+The LiveKit API secret stays on the Node.js backend.
+
+## 10. Secure LiveKit Token Authentication
+Backend generates participant tokens using:
+- `LIVEKIT_URL`
+- `LIVEKIT_API_KEY`
+- `LIVEKIT_API_SECRET`
+
+Credential check:
+```bash
+npm run check:livekit
+```
+Expected result:
 ```text
-server/.env.example
+RESULT: VALID
 ```
 
-to:
+## 11. Connection Status
+The UI can show:
+- Connecting
+- Connected
+- Reconnecting
+- Disconnected
+- Connection Error
 
+Useful connection errors are surfaced to the user.
+
+## 12. Screen Sharing / Present Screen
+- Trainer can present screen.
+- Trainee can present if permission is enabled.
+- Browser screen-selection dialog.
+- Share browser tab, window, or entire screen.
+- Shared content becomes the main stage.
+- Camera participants remain in a filmstrip.
+- Presenter is identified.
+- Stop Presenting.
+- Trainer can block Trainee screen sharing.
+
+## 13. Presentation Layout
+- Shared content receives priority.
+- Camera tiles remain visible.
+- Filmstrip layout appears.
+- Presenter is clearly identified.
+- Presentation can be stopped and restarted.
+
+## 14. Participant Pinning
+- Pin participant locally.
+- Unpin participant.
+- Pinned participant becomes main view.
+- Local pinning does not change everyone else's view.
+
+## 15. Spotlight
+- Trainer can spotlight a participant.
+- Spotlight is classroom-wide.
+- Spotlight is separate from local pinning.
+
+## 16. Active Speaker
+- Uses LiveKit participant information.
+- Active participant can be visually highlighted.
+
+## 17. Participants Panel
+Displays:
+- Participant name
+- Trainer / Trainee role
+- Camera state
+- Microphone state
+- Pin control
+- Trainer moderation menu
+- Participant search
+
+## 18. Trainer Moderation Controls
+Trainer can:
+- Mute participant
+- Disable microphone
+- Allow microphone again
+- Disable camera
+- Allow camera again
+- Block screen sharing
+- Allow screen sharing again
+- Remove participant
+- Allow removed participant to rejoin
+- Spotlight participant
+- Mute all participants
+
+> Trainer restores permission but does not remotely force another user's camera or microphone ON.
+
+## 19. Waiting Room
+When enabled:
+- Trainee requests entry.
+- Trainer sees pending participant.
+- Trainer can Admit or Reject.
+- Trainee waits until admitted.
+
+## 20. Lock Class
+Trainer can lock the classroom so new participants cannot directly join according to session policy.
+
+## 21. Remove Participant and Allow Rejoin
+- Trainer can remove Trainee.
+- Removed participant cannot immediately bypass removal.
+- Trainer can explicitly allow rejoin.
+
+## 22. Real-Time Chat
+- Trainer ↔ Trainee chat.
+- Multi-participant chat.
+- Socket.IO delivery.
+- Sender name.
+- Message time.
+- Current-session chat history.
+- Realtime synchronization.
+
+## 23. Raise Hand
+- Trainee can raise hand.
+- Trainer sees raised-hand state.
+- Trainer can lower hand.
+
+## 24. Meeting Details Panel
+Displays:
+- Course
+- Session title
+- Trainer
+- Meeting ID
+- Start time
+- Duration
+- Trainee invite link
+- Copy meeting ID
+- Copy Trainee invite
+
+## 25. SkillTwin Whiteboard
+Trainer can:
+- Open whiteboard
+- Draw with mouse or touch
+- Clear whiteboard
+- Close whiteboard
+
+Trainee:
+- Automatically sees the same whiteboard.
+- Sees Trainer drawing in real time.
+- Uses the whiteboard in read-only mode.
+
+Whiteboard drawing is synchronized with **Socket.IO**, not screen sharing.
+
+## 26. Whiteboard State Synchronization
+Socket.IO events include:
+- `whiteboard-state`
+- `whiteboard-open`
+- `whiteboard-stroke`
+- `whiteboard-clear`
+- `whiteboard-close`
+
+Late-joining participants can receive the current whiteboard state.
+
+## 27. Realtime Classroom Events
+Socket.IO is used for:
+- Chat
+- Raise hand
+- Spotlight
+- Moderation events
+- Waiting room
+- Session policy
+- Whiteboard synchronization
+- End-class notification
+
+## 28. End Class for Everyone
+When Trainer ends class:
+- Session ends for all participants.
+- LiveKit participants are disconnected.
+- Trainer returns to **Create Live Class**.
+- Trainee sees **Trainer has ended the class.**
+
+## 29. Leave Class
+Trainee can leave independently. Other participants remain in the class. Trainee sees **You left the SkillTwin live class.**
+
+## 30. Session Persistence
+Development backend stores session metadata so a simple server restart does not immediately destroy the session metadata. Production should use MySQL, PostgreSQL, MongoDB, Redis, or another persistent store.
+
+## 31. Responsive Design
+- Desktop-friendly layout.
+- Responsive participant views.
+- `100vh` / `100dvh` safe layout.
+- Side-panel independent scrolling.
+- Meeting controls remain accessible.
+- Presentation and participant views stay inside the viewport.
+
+## 32. SkillTwin Theme
+- SkillTwin logo.
+- White interface.
+- Blue / indigo / purple gradient accents.
+- Dark video stage.
+- Professional learning-oriented layout.
+- Consistent buttons and panels.
+
+## 33. Professional Icons
+Lucide React icons are used for meeting controls instead of emoji icons.
+
+## 34. Tooltips
+Controls can show hover tooltips such as:
+- Mute microphone
+- Turn camera off
+- Present screen
+- Participants
+- Chat
+- Settings
+- More
+- Leave class
+
+## 35. Generic Avatar
+When camera is disabled, a professional generic avatar is shown instead of an emoji.
+
+## 36. Fullscreen
+Users can open the classroom in fullscreen mode.
+
+## 37. Device Settings
+Users can select:
+- Microphone
+- Camera
+
+Browser media permissions are supported.
+
+## 38. Session Timer
+Ongoing class duration is displayed.
+
+## 39. Participant Count
+Total current participants are displayed.
+
+## 40. Error Handling
+Handles or reports:
+- Camera permission failure
+- Microphone permission failure
+- Invalid meeting ID
+- Backend unavailable
+- LiveKit authentication failure
+- LiveKit connection failure
+- Removed participant
+- Ended session
+- Session not found
+
+## 41. React Error Boundary
+Frontend component failures show a useful error screen instead of a blank white page.
+
+## 42. Backend Health Check
+Endpoint:
 ```text
-server/.env
+GET /api/health
+```
+Example:
+```text
+http://localhost:3001/api/health
+```
+It confirms backend status, LiveKit configuration, and LiveKit credential validity.
+
+## 43. Security
+- Never place `LIVEKIT_API_SECRET` in React.
+- Keep secrets in `server/.env`.
+- Do not commit `.env`.
+- Commit `.env.example` instead.
+- Backend generates LiveKit participant tokens.
+- Production role and identity must come from authenticated SkillTwin users.
+
+## 44. Existing LMS Integration
+Designed to plug into the existing SkillTwin LMS. Production routes may look like:
+```text
+/live/:roomName
+```
+Trainer/Trainee identity should come from the SkillTwin authenticated session rather than query parameters.
+
+---
+
+# Architecture
+
+```mermaid
+flowchart LR
+    A[Trainer / Trainee Browser] --> B[React + Vite]
+    B -->|REST API| C[Node.js + Express]
+    B <-->|Socket.IO events| C
+    B <-->|Audio / Video / Screen Share| D[LiveKit Cloud / WebRTC]
+    C -->|Generate participant tokens| D
+    C --> E[Development Session Store]
 ```
 
-Fill your real LiveKit values:
+### Backend Responsibilities
+- Create sessions
+- Create LiveKit tokens
+- Handle moderation
+- Handle chat
+- Handle waiting room
+- Handle whiteboard synchronization
+- Handle session events
+
+### LiveKit Responsibilities
+- Audio
+- Video
+- Screen sharing
+- Participant media tracks
+
+---
+
+# Project Structure
+
+```text
+SkillTwin-Live-Classroom/
+│
+├── client/
+│   ├── src/
+│   │   ├── components/
+│   │   ├── hooks/
+│   │   ├── services/
+│   │   ├── App.jsx
+│   │   └── styles.css
+│   ├── .env.example
+│   ├── index.html
+│   ├── package.json
+│   └── vite.config.js
+│
+├── server/
+│   ├── data/
+│   ├── server.js
+│   ├── store.js
+│   ├── livekit.js
+│   ├── check-livekit.js
+│   ├── env.js
+│   ├── .env.example
+│   └── package.json
+│
+├── docs/
+│   └── screenshots/
+│
+├── package.json
+├── README.md
+└── .gitignore
+```
+
+---
+
+# Installation
+
+```bash
+git clone YOUR_REPOSITORY_URL
+cd YOUR_PROJECT_FOLDER
+npm install
+npm run install:all
+```
+
+---
+
+# Environment Setup
+
+## `server/.env`
 
 ```env
 PORT=3001
-CLIENT_ORIGIN=http://localhost:5173,http://127.0.0.1:5173,https://skilltwin-five.vercel.app
+CLIENT_ORIGIN=http://localhost:5173
 
-LIVEKIT_URL=wss://YOUR_PROJECT.livekit.cloud
-LIVEKIT_API_KEY=YOUR_API_KEY
-LIVEKIT_API_SECRET=YOUR_API_SECRET
+LIVEKIT_URL=wss://your-project.livekit.cloud
+LIVEKIT_API_KEY=your_api_key
+LIVEKIT_API_SECRET=your_api_secret
 ```
 
-Keep `LIVEKIT_API_SECRET` on the server only.
-
-## 2. Client environment
-
-For normal localhost testing, copy:
-
-```text
-client/.env.example
-```
-
-to:
-
-```text
-client/.env
-```
-
-and use:
+## `client/.env`
 
 ```env
 VITE_API_URL=http://localhost:3001
-VITE_PUBLIC_APP_URL=
 ```
 
-For production, `VITE_API_URL` must point to the public Node/Express backend. Do not point it to a local computer.
+> Never place real credentials in this README or commit `server/.env`.
 
-## 3. Install and run
+---
 
-From the main project folder:
+# LiveKit Setup
 
-```bash
-npm install
-npm run install:all
-npm run dev
-```
-
-Expected URLs:
-
-```text
-Frontend: http://localhost:5173
-Backend:  http://localhost:3001
-```
-
-The backend terminal should show:
-
-```text
-LiveKit configured: YES
-```
-
-## 4. Trainer flow
-
-Open:
-
-```text
-http://localhost:5173/?role=trainer&name=Trainer
-```
-
-Then:
-
-1. Create session.
-2. Check camera and microphone in the preview.
-3. Click **Start class**.
-4. Open **Details**.
-5. Click **Copy trainee invite**.
-
-Do not manually edit the Meeting ID.
-
-## 5. Trainee flow
-
-Paste the exact copied invite into another browser / Incognito window.
-
-Example:
-
-```text
-http://localhost:5173/live/SKT-CYBERS-XXXXXX?role=trainee
-```
-
-The trainee enters their name, checks camera/mic, and clicks **Join now**.
-
-Alternatively open:
-
-```text
-http://localhost:5173/
-```
-
-and enter the Meeting ID or paste the complete invite link.
-
-## 6. Test camera properly
-
-Inside the live room test:
-
-```text
-Camera ON -> OFF -> ON -> OFF -> ON
-Mic ON -> OFF -> ON -> OFF -> ON
-Present screen -> Stop presenting -> Present again
-```
-
-If the camera cannot be acquired, the UI now shows a browser/device error instead of silently failing.
-
-## Another phone or computer
-
-`localhost` only works on the same computer.
-
-For LAN testing:
-
-1. Run the app with `npm run dev`.
-2. Open the frontend using the development PC's LAN address, for example `http://192.168.1.20:5173`.
-3. Set `VITE_PUBLIC_APP_URL` to that LAN frontend address if needed.
-4. Add the frontend origin to `CLIENT_ORIGIN`.
-5. Make sure port `3001` is reachable from the trainee device.
-
-For internet/public use, deploy the React frontend and Node/Express backend and set `VITE_API_URL` to the public backend.
-
-## Production integration note
-
-The `role`, `name`, and `userId` query parameters are a development adapter. In the real SkillTwin LMS, use the authenticated LMS user identity/role on the server.
-
-The JSON session store is for reliable local development. For production or multiple backend instances, store classroom state in the LMS database or Redis.
-
-## v7 token + camera stability fixes
-
-This build adds an authenticated LiveKit credential self-test and always loads
-`server/.env` from the server folder (overriding stale machine-level LIVEKIT_*
-variables). Run:
+1. Create a LiveKit Cloud project.
+2. Open **API Keys**.
+3. Generate an API key.
+4. Copy API Key and API Secret.
+5. Copy the Project URL.
+6. Add them to `server/.env`.
+7. Run:
 
 ```bash
 npm run check:livekit
 ```
 
-You must see `RESULT: VALID` before testing Trainer/Trainee media. If it reports
-INVALID, create a fresh API key and matching secret in the same LiveKit Cloud
-project as `LIVEKIT_URL`, save them in `server/.env`, stop the dev server fully,
-and start it again.
+Expected:
+```text
+RESULT: VALID
+```
 
-The pre-join camera and microphone toggles now keep their preview tracks alive
-and switch `track.enabled`, making repeated OFF -> ON toggles reliable. Live
-class camera/microphone toggles continue to use LiveKit's participant media API.
+---
 
+# Running the Project
 
-## v8 functional fixes
+```bash
+npm run dev
+```
 
-This build keeps the existing SkillTwin theme and LiveKit setup, and fixes the runtime issues found during Trainer/Trainee testing:
+Frontend:
+```text
+http://localhost:5173
+```
 
-- Whiteboard no longer crashes with `getBoundingClientRect` on a null element. Pointer coordinates are calculated from a stable SVG ref.
-- The classroom Socket.IO connection now stays alive across React re-renders. Previously the socket could be disconnected when the event callback changed, which caused chat and trainer moderation controls to appear successful without reaching the other participant.
-- Chat messages are acknowledged by the server, broadcast to everyone, and the latest 100 messages are kept with the session so they do not disappear immediately.
-- Trainer controls such as mute, disable microphone, disable camera, block screen share, spotlight, raise-hand updates and policy changes now use the stable realtime socket.
-- Camera, microphone and screen-share buttons keep explicit local React state and synchronize it with LiveKit, making repeated ON -> OFF -> ON toggles reliable.
-- If video is connected but the SkillTwin realtime-control socket is reconnecting, the classroom now shows a warning instead of silently losing chat/moderation actions.
+Backend:
+```text
+http://localhost:3001
+```
 
-### Recommended test
+Keep the terminal running while the classroom is in use.
 
-1. Run `npm run check:livekit` and confirm `RESULT: VALID`.
-2. Run `npm run dev`.
-3. Create a fresh Trainer class.
-4. Open the exact trainee invite in another browser/incognito window.
-5. Test camera ON/OFF/ON, chat in both directions, Trainer Disable camera / Allow camera, Mute microphone / Disable microphone, Spotlight, and Whiteboard.
+---
 
+# Testing Trainer
 
-## v9 requested changes
+Development URL:
+```text
+http://localhost:5173/?role=trainer&name=Trainer
+```
 
-- Replaced the temporary S badge with the supplied SkillTwin logo image across the create, join, pre-join, meeting, error, and ended-class screens.
-- Ending a class for everyone now returns the trainer to the Create Live Class page.
-- Trainees see `Trainer has ended the class.` instead of a generic disconnected/left message.
-- Added a fallback session-state check when LiveKit is disconnected by the server so the ended-class result remains correct even if the realtime event races with disconnect.
-- Opening Whiteboard now starts the browser screen-share picker first. The board opens only after screen sharing is accepted. If the whiteboard itself started sharing, closing the board stops that share.
+1. Create class.
+2. Check camera/microphone.
+3. Start class.
+4. Open **Details**.
+5. Select **Copy trainee invite**.
 
-For whiteboard sharing, choose the SkillTwin browser tab/window in the browser picker so trainees can see the board.
+---
+
+# Testing Trainee
+
+Open the copied Trainee invite in:
+- Edge
+- Chrome Incognito
+- Another browser profile
+
+Enter Trainee name and join.
+
+> Query parameters such as `?role=trainer&name=Trainer` are for development/testing only. In production, role and identity must come from SkillTwin authentication.
+
+---
+
+# Backend Health Check
+
+Open:
+```text
+http://localhost:3001/api/health
+```
+
+Example healthy response:
+```json
+{
+  "ok": true,
+  "livekitConfigured": true,
+  "livekitCredentialsValid": true
+}
+```
+
+---
+
+# Available Scripts
+
+| Command | Purpose |
+|---|---|
+| `npm run dev` | Start server and client in development |
+| `npm run install:all` | Install server and client dependencies |
+| `npm run check:livekit` | Validate LiveKit credentials |
+| `npm run build` | Build frontend for production |
+
+---
+
+# Testing Checklist
+
+- [ ] Create session
+- [ ] Trainer joins
+- [ ] Trainee joins
+- [ ] Camera ON/OFF/ON
+- [ ] Microphone ON/OFF/ON
+- [ ] Trainer → Trainee chat
+- [ ] Trainee → Trainer chat
+- [ ] Raise hand
+- [ ] Lower hand
+- [ ] Pin participant
+- [ ] Unpin participant
+- [ ] Spotlight participant
+- [ ] Screen sharing
+- [ ] Stop screen sharing
+- [ ] Whiteboard opens for Trainer
+- [ ] Whiteboard opens for Trainee
+- [ ] Trainer drawing appears for Trainee
+- [ ] Whiteboard clear synchronizes
+- [ ] Disable Trainee camera
+- [ ] Allow Trainee camera
+- [ ] Disable Trainee microphone
+- [ ] Allow Trainee microphone
+- [ ] Mute participant
+- [ ] Mute all
+- [ ] Block Trainee screen sharing
+- [ ] Waiting room
+- [ ] Admit participant
+- [ ] Reject participant
+- [ ] Lock class
+- [ ] Remove participant
+- [ ] Allow rejoin
+- [ ] End Class for Everyone
+- [ ] Trainee sees Trainer-ended message
+- [ ] Trainee can leave independently
+
+---
+
+# Localhost Limitation
+
+`localhost` works only on the same computer.
+
+For another phone/laptop:
+- Backend must be reachable on LAN/public URL.
+- Frontend must be reachable on LAN/public URL.
+- `VITE_API_URL` must use the reachable backend URL.
+- `CLIENT_ORIGIN` must match the frontend origin.
+- Production should use HTTPS.
+
+---
+
+# Production Deployment
+
+Production should use:
+- Public frontend URL
+- Public backend URL
+- HTTPS
+- Environment variables
+- Persistent database/session storage
+- SkillTwin authentication
+- Server-side role validation
+- Production CORS configuration
+- LiveKit Cloud credentials
+
+Possible options:
+
+| Component | Options |
+|---|---|
+| Frontend | Vercel |
+| Backend | Render, Railway, VPS |
+| Realtime media | LiveKit Cloud |
+| Persistent storage | PostgreSQL, MySQL, MongoDB, Redis |
+
+---
+
+# Browser Requirements
+
+Recommended:
+- Google Chrome
+- Microsoft Edge
+- Modern Chromium-based browsers
+
+Camera, microphone, screen sharing, and fullscreen require browser permissions.
+
+---
+
+# Why SkillTwin Live Classroom?
+
+- Designed specifically for learning.
+- Integrated Trainer/Trainee roles.
+- Built-in moderation.
+- SkillTwin LMS integration ready.
+- Real-time collaboration.
+- Secure backend token generation.
+- Screen sharing.
+- Synchronized interactive whiteboard.
+- Classroom chat.
+- Waiting room.
+- Participant management.
+
+---
+
+# Future Improvements
+
+- Cloud recording with LiveKit Egress
+- Automatic captions / speech-to-text
+- Collaborative file sharing
+- Attendance reports
+- Recording history
+- Database-backed long-term chat
+- Breakout rooms
+- Polls and quizzes
+- Class analytics
+- Full LMS authentication integration
+- Calendar scheduling
+- Notification system
+
+> These are planned improvements, not claims about current functionality.
+
+---
+
+# Contributing
+
+1. Fork the repository.
+2. Create a feature branch.
+3. Make and test your changes.
+4. Commit your work.
+5. Push the branch.
+6. Open a pull request.
+
+---
+
+# License
+
+Add your preferred license here.
+
+> Do not claim an MIT or other license unless you intentionally choose it and add the matching license file.
+
+---
+
+# Project
+
+Developed as part of the **SkillTwin** project.
+
+**SkillTwin Live Classroom** — real-time learning, Trainer control, and collaborative classroom communication in one modular live-class experience.
